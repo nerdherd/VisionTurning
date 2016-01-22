@@ -54,17 +54,20 @@ public class Robot extends IterativeRobot {
         
         double pow = 0;
         
-        if(centerX != emptyVal)	{
-        	
-        	// Find the biggest contour
-        	int max = 0;
-        	for(int i = 0; i < area.length; i++)	{
-        		max = area[i] > max ? i : max;
+        if(centerX != null && centerX != emptyVal)	{
+        	try	{
+	        	// Find the biggest contour
+	        	int max = 0;
+	        	for(int i = 0; i < area.length; i++)	{
+	        		max = area[i] > max ? i : max;
+	        	}
+	        	
+	        	double desired = camWidth/2;
+	        	double error = desired-centerX[max];
+	        	pow = Math.abs(error) > 5 ? -kP * error : 0;
+        	}	catch(Exception e)	{
+        		pow = 0;
         	}
-        	
-        	double desired = camWidth/2;
-        	double error = desired-centerX[max];
-        	pow = kP * error;
         }	else	{
         	pow = 0;
         }
