@@ -29,7 +29,7 @@ public class Robot extends IterativeRobot {
 	
 	AHRS nav;
 	
-	double kP = 0.003;
+	double kP = 0.00245;
 	double camWidth = 320;
     
     public void robotInit()	{
