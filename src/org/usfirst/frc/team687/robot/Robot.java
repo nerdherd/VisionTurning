@@ -30,10 +30,15 @@ public class Robot extends IterativeRobot {
 	AHRS nav;
 	
 	double kP = 0.00245;
+	double kI = 0.0;
+	double kD = 0.0001;
 	double camWidth = 320;
-    
+    NerdyPID pid;
+	
     public void robotInit()	{
         table = NetworkTable.getTable("GRIP/myContoursReport");
+        
+        pid = new NerdyPID(kP, kI, kD);
     	
         ftLeft = new VictorSP(0);
         ftRight = new VictorSP(3);
@@ -41,12 +46,13 @@ public class Robot extends IterativeRobot {
         bkRight = new VictorSP(4);
         
         nav = new AHRS(new SerialPort(57600, SerialPort.Port.kMXP));
+        pid.setDesired(camWidth/2);
     }
 
     /**
      * This function is called periodically during operator control
      */
-    public void teleopPeriodic() {
+    public void autonomousPeriodic() {
     	// Get the Contour Report
     	double[] emptyVal = new double[0];
         double[] centerX = table.getNumberArray("centerX", emptyVal);
@@ -61,10 +67,8 @@ public class Robot extends IterativeRobot {
 	        	for(int i = 0; i < area.length; i++)	{
 	        		max = area[i] > max ? i : max;
 	        	}
-	        	
-	        	double desired = camWidth/2;
-	        	double error = desired-centerX[max];
-	        	pow = Math.abs(error) > 5 ? -kP * error : 0;
+	        	SmartDashboard.putNumber("CenterX", centerX[max]);
+	        	pow = pid.calculate(centerX[max]);
         	}	catch(Exception e)	{
         		pow = 0;
         	}
